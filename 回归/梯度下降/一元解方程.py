@@ -23,7 +23,7 @@ def paint(n):
 
     x=x_picks[n]
     y=y_picks[n]
-    p.set_data(x,y)
+    p.set_data([x],[y])
 
 
 if __name__ == '__main__':
