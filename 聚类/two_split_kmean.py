@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from numpy.linalg import norm
 from sklearn.datasets import make_blobs
 import matplotlib.pyplot as plt
@@ -44,9 +45,11 @@ def km(data, k=2):
 
         tags[:, 0] = tag
         tags[:, 1] = dis
-        for i in range(len(clusts)):
-            cls = data[np.nonzero(tags[:, 0] == i)[0]]
-            clusts[i] = cls.mean(axis=0)
+        # for i in range(len(clusts)):
+        #     cls = data[np.nonzero(tags[:, 0] == i)[0]]
+        #     clusts[i] = cls.mean(axis=0)
+        df = pd.DataFrame(data)
+        clusts = df.groupby(tags[:, 0]).apply(lambda x: x.mean(axis=0)).values
 
     return clusts, tags
 
@@ -61,8 +64,8 @@ def two_km(data, k):
     tags = np.zeros((m, 2))
     ts.append(tags[:, 0].copy())
 
+    
     while len(clusts) < k:
-
         SSE = np.inf
         for i in range(len(clusts)):
             cur_data = data[tags[:, 0] == i]
@@ -107,7 +110,7 @@ def paint(n):
 
 if __name__ == '__main__':
 
-    k = 5
+    k = 6
     x, y = make_blobs(200, 2, centers=k, cluster_std=0.5)
 
     cs, ts = two_km(x, k)
