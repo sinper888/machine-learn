@@ -1,46 +1,75 @@
-import numpy as np
-
+import numpy as np 
 
 class Bp:
 
+    def __init__(self,x,y):
+        
+        self.x=x
+        self.y=y
+
+    def forward(self,w):
+
+        x_=self.x
+        fys=[]
+        for var in w:
+            p=self.sigmoid(x_,var)
+            fys.append(p)
+            x_=p
+        return fys
+
+
     def sigmoid(self,x,w):
 
-        return 1/(1+np.exp(-w.dot(x)))
+        return 1/(1+np.exp(-x.dot(w)))
+    
+    def loss(self,w):
 
-    def loss(self, x, w, y):
+        fys=self.forward(w)
+        p=fys[-1]
+        return (((p-self.y).T.dot(p-self.y))/2)
+    
+    def backward(self,fys,w,alpha):
+        
+        err=fys[1]-self.y  
+        g1=fys[0].dot(err*(fys[1]*(1-fys[1])))
 
-        return ((self.sigmoid(x, w)-y).T.dot(self.sigmoid(x, w)-y))/2
+        p=err.dot(w[1].T)        
+        g0=self.x.T.dot(fys[0]*(1-fys[0])*p)
 
-    def grad(self, x, w, y):
+        w[1]=w[1]-alpha*g1
+        w[0]=w[0]-alpha*g0
 
-        outer = self.sigmoid(x, w)*(1-self.sigmoid(x, w)).dot(x.T)
-
-        inner = w.dot(x).dot(x.T)-y.dot(x.T)
-
-        return inner*outer
-
-
+        return w
+    
 if __name__ == '__main__':
 
-    w = np.array([[0.4, 0.4, 0.6],
-                  [0.5, 0.5, 0.6]])  # 2*3
-    x = np.array([[0.574],
-                 [0.574],  # 3*1
-                  [1]])
-    y = np.array([[0], [1]])
+    x0=np.array([[0 ,0 ,1],
+                 [1, 0 ,1],
+                 [0, 1, 1],
+                 [1 ,1 ,1]])
+    
+    y=np.array([[0],[1],[1],[0]])
+    
+    w1=np.random.rand(3,4)*5
+    w1[:,-1]=1
+    w2=np.random.rand(4,1)*5
+    w2[:,-1]=1
+    ws=[w1,w2]
 
-    bp = Bp()
+    bp=Bp(x0,y)
 
-    init_loss = bp.loss(x, w, y)
-    print(init_loss)
-    # while True:
-    #     w -= 0.5*bp.grad(x, w, y)
-    #     new_loss = bp.loss(x, w, y)
-    #     if np.allclose(new_loss, init_loss):
-    #         break
-    #     init_loss = new_loss
-    ws=w-0.5*bp.grad(x,w,y)
-    print(ws)
-    print(bp.sigmoid(x, w))
+    alpha=0.01
+
+    while True:
+        fys=bp.forward(ws)
+        new=bp.backward(fys,ws,alpha)
+        new_loss=bp.loss(new).ravel()[0]
+        if new_loss<1e-2:
+            break
+        ws=new
+    res=bp.forward(ws)[-1]
+    print(res)
+
 
     
+
