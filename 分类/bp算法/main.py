@@ -37,8 +37,8 @@ class Bp:
         err=fys[1]-self.y  
         g1=fys[0].dot(err*self.dsigmoid(fys[1]))
 
-        p=err.dot(w[1].T)        
-        g0=self.x.T.dot(self.dsigmoid(fys[0])*p)
+        err0=err.dot(w[1].T)        
+        g0=self.x.T.dot(err0*self.dsigmoid(fys[0]))
 
         w[1]=w[1]-alpha*g1
         w[0]=w[0]-alpha*g0
