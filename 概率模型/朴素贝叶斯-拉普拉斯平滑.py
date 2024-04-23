@@ -18,11 +18,11 @@ def train(x, y, alpha=1):  # 返回 条件概率模型 (不同分类标签下 �
 
     counts.fillna(0, inplace=True)
 
-    uni_x = x.apply(lambda x: len(x.unique()*alpha), axis=0)
+    uni_x = x.apply(lambda x: len(x.unique()), axis=0)
 
     ser = pd.Series(np.tile(uni_x, num_class), index=counts.index)
 
-    res = (counts+alpha).div(counts.sum(axis=1)+ser, axis=0)
+    res = (counts+alpha).div(counts.sum(axis=1)+ser*alpha, axis=0)
 
     return np.log(res)
 
@@ -63,6 +63,7 @@ if __name__ == '__main__':
     x, tesx, y, tesy = train_test_split(
         data, label, train_size=0.7, shuffle=True)
 
+
     m, n = x.shape
     colname = [f'x{i}' for i in range(n)]
 
@@ -77,7 +78,7 @@ if __name__ == '__main__':
     groups = model.groupby(level=0, as_index=False)
 
     py = y.value_counts()  # 不同类别的先验概率
-    pys = np.log((py+1)/(py.sum()+num_class))
+    pys = np.log((py+alpha)/(py.sum()+num_class*alpha))
 
     tesx = pd.DataFrame(tesx, columns=colname)
     y_pred = tesx.apply(test, axis=1).values.ravel()
