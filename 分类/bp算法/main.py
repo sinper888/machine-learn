@@ -28,13 +28,17 @@ class Bp:
         p=fys[-1]
         return (((p-self.y).T.dot(p-self.y))/2)
     
+    def dsigmoid(self,y):
+
+        return y*(1-y)
+    
     def backward(self,fys,w,alpha):
         
         err=fys[1]-self.y  
-        g1=fys[0].dot(err*(fys[1]*(1-fys[1])))
+        g1=fys[0].dot(err*self.dsigmoid(fys[1]))
 
         p=err.dot(w[1].T)        
-        g0=self.x.T.dot(fys[0]*(1-fys[0])*p)
+        g0=self.x.T.dot(self.dsigmoid(fys[0])*p)
 
         w[1]=w[1]-alpha*g1
         w[0]=w[0]-alpha*g0
