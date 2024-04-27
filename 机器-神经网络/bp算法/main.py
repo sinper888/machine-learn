@@ -16,7 +16,6 @@ class Perceptrons:
     def sigmoid(self,x):
 
         return 1/(1+np.exp(-x))
-    
 
     def dsigmoid(self,x):
 

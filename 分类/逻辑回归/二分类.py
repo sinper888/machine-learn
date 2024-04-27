@@ -1,32 +1,37 @@
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 
 def sigmoid(x,w):
-    f=-x.dot(w)
-    if (f>500).any():
-        inx,iny=np.where(f>500)
-        absf=-np.abs(f)
-        fs=np.exp(absf)
-        fs[inx,iny]=1/(fs[inx,iny]+EPS)
-    else:
-        fs=np.exp(f)
+    # f=-x.dot(w)
+    # if (f>500).any():
+    #     inx,iny=np.where(f>500)
+    #     absf=-np.abs(f)
+    #     fs=np.exp(absf)
+    #     fs[inx,iny]=1/(fs[inx,iny]+EPS)
+    # else:
+    #     fs=np.exp(f)
 
-    return 1/(1+fs)
+    # return 1/(1+fs)
+
+    return 1/(1+np.exp(-x.dot(w)))
 
 def loss(x,w,y):
 
-    return (-1/m)*((y*(x.dot(w))+np.log(1-sigmoid(x,w)+EPS)).sum())
+    # return (-1/m)*((y*(x.dot(w))+np.log(1-sigmoid(x,w)+EPS)).sum())
+    return (-1/m)*(y*(x.dot(w))+np.log(1-sigmoid(x,w))).sum()
 
 def grad(x,w):
 
-    return (1/m)*(x.T.dot(sigmoid(x,w)-y))
+    return (1/m)*x.T.dot(sigmoid(x,w)-y)
 
 if __name__ == '__main__':
 
-    EPS=1e-5
     com=load_breast_cancer()
+    scale=MinMaxScaler()
     data,label=com['data'],com['target']
+    data=scale.fit_transform(data)
 
     x,tesx,y,tesy=train_test_split(data,label,train_size=0.7,
                                    shuffle=True)
@@ -36,7 +41,7 @@ if __name__ == '__main__':
     w=np.zeros((n,1))
 
     init_loss=loss(x,w,y)
-    lr=0.0001
+    lr=0.01
     while True:
         w-=lr*grad(x,w)
         new_loss=loss(x,w,y)
