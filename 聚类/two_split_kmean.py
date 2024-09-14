@@ -82,6 +82,13 @@ def two_km(data, k):
 
         mid_tag[mid_tag[:, 0] == 1, 0] = len(clusts)
         mid_tag[mid_tag[:, 0] == 0, 0] = sign
+        '''
+        上述两行代码的位置不可交换 
+        
+        假设交换上面两行 如果此时sign=1 那么mid_tag内的所有标签为0都会
+        转化为1 这会导致执行交换后的第二行时 mid_tag[:,0]==1这一步时 所有的
+        标签都为1 产生错误
+        '''
         tags[tags[:, 0] == sign, :] = mid_tag
 
         ts.append(tags[:, 0].copy())
